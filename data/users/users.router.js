@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("./users.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mw = require("../middleware/restricted.middleware");
 
 const router = express.Router();
 
@@ -51,12 +52,8 @@ router.post("/login", (req, res) => {
   db.findBy({ username })
     .first()
     .then(user => {
-      console.log("im here");
       if (user && bcrypt.compareSync(password, user.password)) {
-        console.log("im here");
-
         const token = generateToken(user);
-        console.log("im here");
 
         res.status(200).json({
           token,
@@ -68,7 +65,8 @@ router.post("/login", (req, res) => {
     });
 });
 
-router.get("/users", (req, res) => {
+//create restricted access for people with token
+router.get("/users", mw.restricted, (req, res) => {
   db.find()
     .then(users => {
       res.status(200).json({
@@ -84,11 +82,11 @@ router.get("/users", (req, res) => {
     });
 });
 
-//generate token function
+//generate token function and put in separate folder
 
 function generateToken(user) {
   payload = {
-    subject: user.id,
+    sub: user.id,
     username: user.username,
     password: user.password
   };
