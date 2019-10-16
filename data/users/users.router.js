@@ -71,7 +71,8 @@ router.get("/users", mw.restricted, (req, res) => {
   db.find()
     .then(users => {
       res.status(200).json({
-        loggInUser: req.username,
+        loggInUser: req.user.username,
+        password: req.user.password,
         users: users,
         message: "Here are all the users!"
       });

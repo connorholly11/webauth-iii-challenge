@@ -13,7 +13,11 @@ function restricted(req, res, next) {
       if (err) {
         res.status(401).json({ message: "invalid" });
       } else {
-        req.username = decodedToken.username;
+        req.user = {
+          username: decodedToken.username, //username is referring to user.username in the payload
+          password: decodedToken.password
+        }; //these are coming from the payload in the users router
+
         next();
       }
     });
